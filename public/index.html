@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timesheet Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="recordingOverlay" class="recording-overlay">
+    <div class="recording-pill">
+      <span class="dot"></span>
+      Recording… tap button to stop
+    </div>
+  </div>
+  <div class="app">
+    <h1>Timesheet Assistant</h1>
+    <p class="subtitle">1–2–3: Speak your day, tweak the table, copy the report.</p>
+
+    <div class="card">
+      <!-- STEP 1: INPUT -->
+      <div class="field">
+        <div class="step-label">
+          <span class="step-num">1</span> Speak or Type Today’s Work
+        </div>
+        <p class="hint">
+          Say or type the <strong>Date</strong>, <strong>Job Site</strong>, then list each
+          <strong>Worker</strong> with <strong>Start</strong> and <strong>End</strong> times.
+          <span class="hint-example">
+            Example: December 2nd, Caesars booth 410, John 7:30 AM to 4:15 PM, Mike 8 to 3…
+          </span>
+        </p>
+
+        <textarea
+          id="transcript"
+          rows="4"
+          placeholder="Click the mic and say something like: 'December 2nd, Caesars booth 410, John 7:30 AM to 4:15 PM, Mike 8 to 3…'"
+        ></textarea>
+
+        <div class="buttons-row">
+          <button id="recordBtn" class="btn btn-outline">
+            🎤 Start Recording
+          </button>
+          <button id="buildTableBtn" class="btn btn-primary">
+            Build Table
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: TABLE -->
+      <div class="field" style="margin-top: 1.5rem;">
+        <div class="step-label">
+          <span class="step-num">2</span> Review & Edit Workers
+        </div>
+        <p class="hint">
+          The table below is your source of truth. Edit any cell if needed — the final report
+          and CSV will use whatever is in this table.
+        </p>
+        <div id="outputTable" class="table-wrapper">
+          <p class="muted">Build the table above to see rows here.</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: NOTES + FINAL REPORT -->
+      <div class="field" style="margin-top: 1.5rem;">
+        <div class="step-label">
+          <span class="step-num">3</span> Add Notes & Generate Report
+        </div>
+        <p class="hint">
+          Optional: add any notes for your bookkeeper or client. The AI will combine these with
+          the table into one clean report.
+        </p>
+
+        <textarea
+          id="notes"
+          rows="3"
+          placeholder="Example: John stayed 2 extra hours with client approval, need an extra ladder tomorrow…"
+        ></textarea>
+
+        <div class="buttons-row">
+          <button id="recordNotesBtn" class="btn btn-outline">
+            🎤 Record Notes
+          </button>
+          <button id="finalReportBtn" class="btn btn-primary">
+            Generate Final Report
+          </button>
+        </div>
+
+        <textarea
+          id="finalReportOutput"
+          rows="8"
+          style="margin-top: 10px;"
+        placeholder="Final report will appear here. You can edit it before sending."
+        ></textarea>
+
+        <div class="buttons-row" style="margin-top: 10px;">
+          <button id="copyCsvBtn" class="btn btn-secondary">
+            Copy CSV
+          </button>
+
+          <button id="downloadCsvBtn" class="btn btn-outline">
+            ⬇️ Download CSV
+          </button>
+
+          <button id="copyReportBtn" class="btn btn-secondary">
+            Copy Full Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
