@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const recordNotesBtn = document.getElementById('recordNotesBtn');
   const buildReportBtn = document.getElementById('finalReportBtn');
   const finalReportOutput = document.getElementById('finalReportOutput');
-  const copyReportBtn = document.getElementById('copyReportBtn');
+  const copyFullReportBtn = document.getElementById('copyFullReportBtn');
 
   const copyCsvBtn = document.getElementById('copyCsvBtn');
   const downloadCsvBtn = document.getElementById('downloadCsvBtn');
@@ -726,29 +726,43 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 
-  // --- COPY FULL REPORT HANDLER ---
-  if (copyReportBtn && finalReportOutput) {
-    copyReportBtn.addEventListener('click', async () => {
-      const text = finalReportOutput.value.trim();
+  // === PATCH: Copy Full Report – raw, unencoded text ===
+  const copyFullReportBtnEl = copyFullReportBtn;
 
-      if (!text) {
-        alert('There is no full report text to copy yet.');
+  if (copyFullReportBtnEl) {
+    copyFullReportBtnEl.addEventListener('click', () => {
+      const finalReportEl = document.getElementById('finalReportOutput');
+      const txt = finalReportEl ? finalReportEl.value || '' : '';
+
+      if (!txt.trim()) {
+        alert('No report to copy yet.');
         return;
       }
 
-      try {
-        await navigator.clipboard.writeText(text);
-        alert('Full report copied to clipboard.');
-      } catch (err) {
-        console.error('Clipboard error:', err);
+      // Create a temporary textarea to ensure we copy RAW text (no URL encoding)
+      const temp = document.createElement('textarea');
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      temp.value = txt;
 
-        // Fallback for browsers that don't allow clipboard API
-        finalReportOutput.focus();
-        finalReportOutput.select();
-        alert(
-          'Could not auto-copy. The report text is selected — press Ctrl/Cmd + C.'
-        );
+      document.body.appendChild(temp);
+      temp.focus();
+      temp.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          alert('Full report copied!');
+        } else {
+          // Fallback if execCommand fails for some reason
+          alert('Could not auto-copy. The report is selected – tap Copy.');
+        }
+      } catch (err) {
+        console.error('Copy failed:', err);
+        alert('Could not auto-copy. The report is selected – tap Copy.');
       }
+
+      document.body.removeChild(temp);
     });
   }
 
