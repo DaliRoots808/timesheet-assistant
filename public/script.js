@@ -1,15 +1,108 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const transcriptInput = document.getElementById('transcript');
-  const recordBtn = document.getElementById('recordBtn');
-  const buildTableBtn = document.getElementById('buildTableBtn');
-  const outputTable = document.getElementById('outputTable');
-  const recordingOverlay = document.getElementById('recordingOverlay');
+const transcriptInput = document.getElementById('transcript');
+const recordBtn = document.getElementById('recordBtn');
+const buildTableBtn = document.getElementById('buildTableBtn');
+const outputTable = document.getElementById('outputTable');
+const recordingOverlay = document.getElementById('recordingOverlay');
 
-  const notesInput = document.getElementById('notes');
-  const recordNotesBtn = document.getElementById('recordNotesBtn');
-  const buildReportBtn = document.getElementById('finalReportBtn');
-  const finalReportOutput = document.getElementById('finalReportOutput');
-  const copyFullReportBtn = document.getElementById('copyFullReportBtn');
+const notesInput = document.getElementById('notes');
+const recordNotesBtn = document.getElementById('recordNotesBtn');
+const buildReportBtn = document.getElementById('finalReportBtn');
+const finalReportOutput = document.getElementById('finalReportOutput');
+const copyFullReportBtn = document.getElementById('copyFullReportBtn');
+const CELEBRATION_GIFS = [
+  'celebrate1.gif',
+  'celebrate2.gif',
+  'celebrate3.gif',
+  'celebrate4.gif',
+  'celebrate5.gif'
+];
+  const celebrationGifs = [
+    'gifs/tmp_1.gif',
+    'gifs/tmp_2.gif',
+    'gifs/tmp_3.gif',
+    'gifs/tmp_4.gif',
+    'gifs/tmp_5.gif'
+  ];
+
+  function showCelebrationGif() {
+    const overlay = document.getElementById('gifOverlay');
+    const img = document.getElementById('successGif');
+    if (!overlay || !img || !celebrationGifs.length) return;
+
+    const randomIndex = Math.floor(Math.random() * celebrationGifs.length);
+    img.src = celebrationGifs[randomIndex];
+
+    overlay.classList.add('show');
+
+    setTimeout(() => {
+      overlay.classList.remove('show');
+    }, 2200);
+  }
+
+  // Show the celebration modal with a random GIF
+  function showCelebration() {
+    const modal = document.getElementById('celebration-modal');
+    const gif = document.getElementById('celebration-gif');
+
+    if (!modal || !gif || !CELEBRATION_GIFS.length) return;
+
+    const pick =
+      CELEBRATION_GIFS[Math.floor(Math.random() * CELEBRATION_GIFS.length)];
+
+    gif.src = `/img/celebrate/${pick}`;
+    modal.style.display = 'flex';
+
+    modal.onclick = () => {
+      modal.style.display = 'none';
+      gif.src = '';
+    };
+  }
+
+  /* -------------------------------------------------------
+     Celebration GIF Overlay (Full-screen modal)
+  ------------------------------------------------------- */
+  function showCelebrationGIF() {
+    const gifs = [
+      'img/celebrate/celebrate1.gif',
+      'img/celebrate/celebrate2.gif',
+      'img/celebrate/celebrate3.gif',
+      'img/celebrate/celebrate4.gif',
+      'img/celebrate/celebrate5.gif'
+    ];
+    const chosen = gifs[Math.floor(Math.random() * gifs.length)];
+
+    const backdrop = document.createElement('div');
+    backdrop.style.position = 'fixed';
+    backdrop.style.top = 0;
+    backdrop.style.left = 0;
+    backdrop.style.width = '100vw';
+    backdrop.style.height = '100vh';
+    backdrop.style.background = 'rgba(0,0,0,0.55)';
+    backdrop.style.backdropFilter = 'blur(6px)';
+    backdrop.style.webkitBackdropFilter = 'blur(6px)';
+    backdrop.style.display = 'flex';
+    backdrop.style.alignItems = 'center';
+    backdrop.style.justifyContent = 'center';
+    backdrop.style.zIndex = 99999;
+    backdrop.style.transition = 'opacity 0.25s ease';
+
+    const gif = document.createElement('img');
+    gif.src = chosen;
+    gif.style.maxWidth = '85vw';
+    gif.style.maxHeight = '85vh';
+    gif.style.borderRadius = '16px';
+    gif.style.boxShadow = '0 0 30px rgba(0,0,0,0.6)';
+    gif.style.objectFit = 'contain';
+
+    backdrop.appendChild(gif);
+    document.body.appendChild(backdrop);
+
+    backdrop.addEventListener('click', () => {
+      backdrop.style.opacity = '0';
+      setTimeout(() => backdrop.remove(), 250);
+    });
+  }
 
   const copyCsvBtn = document.getElementById('copyCsvBtn');
   const downloadCsvBtn = document.getElementById('downloadCsvBtn');
@@ -69,6 +162,37 @@ document.addEventListener('DOMContentLoaded', () => {
     let hours = (endMinutes - startMinutes) / 60;
     hours = Math.round(hours * 4) / 4; // nearest 0.25
     return hours.toFixed(2);
+  }
+
+  // Date helpers for table inputs
+  function csvDateToIso(dateStr) {
+    if (!dateStr) return '';
+    const parts = String(dateStr).split('/');
+    if (parts.length !== 3) return '';
+    const mm = parts[0].padStart(2, '0');
+    const dd = parts[1].padStart(2, '0');
+    const yyyy = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+    if (!mm || !dd || !yyyy) return '';
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function isoDateToCsv(iso) {
+    if (!iso) return '';
+    const parts = String(iso).split('-');
+    if (parts.length !== 3) return '';
+    const yyyy = parts[0];
+    const mm = parts[1].padStart(2, '0');
+    const dd = parts[2].padStart(2, '0');
+    return `${mm}/${dd}/${yyyy}`;
+  }
+
+  function isoDateToShortDisplay(iso) {
+    if (!iso) return '';
+    const parts = String(iso).split('-');
+    if (parts.length !== 3) return '';
+    const mm = parts[1].padStart(2, '0');
+    const dd = parts[2].padStart(2, '0');
+    return `${mm}/${dd}`;
   }
 
   // --- Helpers to build final report text from table + notes ---
@@ -131,14 +255,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = td.querySelector('input');
         if (input) {
           const val = (input.value || '').trim();
+          if (input.type === 'date') {
+            return isoDateToCsv(val);
+          }
           if (input.dataset.field === 'start' || input.dataset.field === 'end') {
             return time24To12(val);
           }
           return val;
-        }
-        if (idx === dateIdx) {
-          const full = td.getAttribute('data-full-date');
-          if (full) return full.trim();
         }
         return td.textContent.trim();
       }
@@ -457,15 +580,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (idx === hoursIdx) {
           html += `<td><input type="number" class="ts-input" data-field="hours" step="0.25" min="0" value="${safe || ''}"></td>`;
         } else if (idx === dateIdx) {
-          // shorten date visually to MM/DD but keep full in data attribute
-          const fullDate = safe;
-          let shortDate = safe;
-          const parts = safe.split('/');
-          if (parts.length === 3) {
-            shortDate =
-              parts[0].padStart(2, '0') + '/' + parts[1].padStart(2, '0');
-          }
-          html += `<td contenteditable="true" data-field="date" data-full-date="${fullDate}">${shortDate}</td>`;
+          const isoValue = csvDateToIso(safe);
+          html += `<td><input type="date" class="ts-input table-date-input" value="${isoValue}" placeholder="No date"></td>`;
         } else {
           html += `<td contenteditable="true">${safe}</td>`;
         }
@@ -575,21 +691,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           // Date column: prefer full date from data attribute
           if (idx === dateIndex) {
-            const full = td.getAttribute('data-full-date') || '';
-            if (full) {
-              return full.replace(/,/g, ' ');
-            }
-            // if user edited the visible value, try to rebuild full date using current year
-            const visible = td.textContent.trim();
-            const parts = visible.split('/');
-            if (parts.length === 2) {
-              const month = parts[0].padStart(2, '0');
-              const day = parts[1].padStart(2, '0');
-              const year = new Date().getFullYear().toString();
-              return `${month}/${day}/${year}`;
-            }
-            // if empty, just return empty (no date)
-            return '';
+            const dateInput = td.querySelector('.table-date-input');
+            const iso = dateInput ? dateInput.value : '';
+            const csvDate = isoDateToCsv(iso);
+            return csvDate.replace(/,/g, ' ');
           }
 
           // All other plain-text cells
@@ -739,7 +844,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Create a temporary textarea to ensure we copy RAW text (no URL encoding)
       const temp = document.createElement('textarea');
       temp.style.position = 'fixed';
       temp.style.opacity = '0';
@@ -753,8 +857,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const successful = document.execCommand('copy');
         if (successful) {
           alert('Full report copied!');
+          if (!document.getElementById('celebration-overlay')) {
+            setTimeout(() => {
+              showCelebrationGIF();
+            }, 150);
+          }
         } else {
-          // Fallback if execCommand fails for some reason
           alert('Could not auto-copy. The report is selected – tap Copy.');
         }
       } catch (err) {
@@ -906,3 +1014,63 @@ document.addEventListener('DOMContentLoaded', () => {
     startRecording(notesInput, recordNotesBtn);
   });
 });
+
+/* —————————————————––
+   Celebration GIF Overlay (Full-screen modal) — SAFE VERSION
+    • Only one overlay at a time
+    • Tap anywhere to dismiss
+—————————————————–– */
+function showCelebrationGIF() {
+  const existing = document.getElementById('celebration-overlay');
+  if (existing) {
+    existing.remove();
+  }
+
+  const gifs = [
+    'img/celebrate/celebrate1.gif',
+    'img/celebrate/celebrate2.gif',
+    'img/celebrate/celebrate3.gif',
+    'img/celebrate/celebrate4.gif',
+    'img/celebrate/celebrate5.gif'
+  ];
+  const chosen = gifs[Math.floor(Math.random() * gifs.length)];
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'celebration-overlay';
+  backdrop.style.position = 'fixed';
+  backdrop.style.top = 0;
+  backdrop.style.left = 0;
+  backdrop.style.width = '100vw';
+  backdrop.style.height = '100vh';
+  backdrop.style.background = 'rgba(0,0,0,0.55)';
+  backdrop.style.backdropFilter = 'blur(6px)';
+  backdrop.style.webkitBackdropFilter = 'blur(6px)';
+  backdrop.style.display = 'flex';
+  backdrop.style.alignItems = 'center';
+  backdrop.style.justifyContent = 'center';
+  backdrop.style.zIndex = 99999;
+  backdrop.style.opacity = '0';
+  backdrop.style.transition = 'opacity 0.25s ease';
+
+  const gif = document.createElement('img');
+  gif.src = chosen;
+  gif.alt = 'Success!';
+  gif.style.maxWidth = '85vw';
+  gif.style.maxHeight = '85vh';
+  gif.style.borderRadius = '16px';
+  gif.style.boxShadow = '0 0 30px rgba(0,0,0,0.6)';
+  gif.style.objectFit = 'contain';
+
+  backdrop.appendChild(gif);
+  document.body.appendChild(backdrop);
+
+  requestAnimationFrame(() => {
+    backdrop.style.opacity = '1';
+  });
+
+  backdrop.addEventListener('click', (e) => {
+    e.stopPropagation();
+    backdrop.style.opacity = '0';
+    setTimeout(() => backdrop.remove(), 250);
+  });
+}

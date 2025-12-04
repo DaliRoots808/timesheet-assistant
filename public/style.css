@@ -326,6 +326,16 @@ margin-top: 0.75rem;
   font-size: 0.9rem;
 }
 
+#timesheetTable input[type="date"] {
+  font: inherit;
+  padding: 0.25rem 0.35rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Mobile tweaks */
 @media (max-width: 640px) {
 .table {
@@ -347,6 +357,53 @@ font-size: 0.82rem;
 max-width: 68px;
 font-size: 0.82rem;
 }
+}
+
+/* Celebration GIF overlay */
+.gif-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
+}
+
+.gif-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.gif-inner {
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gif-inner img {
+  max-width: 260px;
+  max-height: 260px;
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  background: #000;
+}
+
+/* Celebration modal fade-in animation */
+#celebration-modal {
+  animation: fadeInCelebration 0.25s ease-out forwards;
+}
+
+@keyframes fadeInCelebration {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* === Recording state === */
@@ -462,6 +519,34 @@ body {
   font-weight: 900;
   color: #f97316; /* orange accent */
   line-height: 1;
+}
+
+/* Step section number (the big orange numbers) */
+.step-number {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #ff7a00;
+  margin-right: 0.35rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure all step headers stay aligned across mobile & desktop */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Center the “Build the table above…” helper text */
+.build-helper {
+  text-align: center !important;
+  width: 100%;
+  display: block;
+  margin-top: 0.25rem;
+  color: #6b7280;
 }
 
 /* Center main titles and descriptive text */
