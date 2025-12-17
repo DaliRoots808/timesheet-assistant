@@ -349,83 +349,74 @@ const CELEBRATION_GIFS = [
   }
 
   function buildFinalReportTextFromRows(rows, notesText) {
-    if (!rows.length) {
-      return 'No rows found in the timesheet table.';
+    if (!rows || !rows.length) return 'No rows found in the timesheet table.';
+
+    // Sort by date, then start time, then worker (keeps it clean if multiple days exist)
+    rows = [...rows].sort((a, b) => {
+      const dA = parseDateKeyForSort(a.date || '');
+      const dB = parseDateKeyForSort(b.date || '');
+      if (dA !== dB) return dA - dB;
+
+      const tA = parseTimeToMinutes12(a.start || '');
+      const tB = parseTimeToMinutes12(b.start || '');
+      if (tA !== tB) return tA - tB;
+
+      return (a.worker || '')
+        .toLowerCase()
+        .localeCompare((b.worker || '').toLowerCase());
+    });
+
+    const jobTitle = pickPrimaryJobSite(rows) || 'Job';
+
+    // — Formatting helpers to match the screenshot vibe —
+    function fmtTime(t) {
+      // Input examples: “08:00 AM”, “01:15 PM”
+      // Output examples: “8am”, “1:15pm”
+      if (!t) return '';
+      const s = String(t).trim().toLowerCase();
+
+      const m = s.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
+      if (!m) return s;
+
+      const hh = parseInt(m[1], 10);
+      const mm = m[2];
+      const ap = m[3].toLowerCase();
+
+      // remove leading zero hour
+      const hourStr = String(hh);
+
+      // drop :00
+      if (mm === '00') return `${hourStr}${ap}`;
+      return `${hourStr}:${mm}${ap}`;
     }
 
-    // sort rows by date, then time
-    rows.sort((a, b) => {
-      const dKeyA = parseDateKeyForSort(a.date);
-      const dKeyB = parseDateKeyForSort(b.date);
-      if (dKeyA !== dKeyB) return dKeyA - dKeyB;
-      const tKeyA = parseTimeToMinutes12(a.start);
-      const tKeyB = parseTimeToMinutes12(b.start);
-      if (tKeyA !== tKeyB) return tKeyA - tKeyB;
-      return a.worker.toLowerCase().localeCompare(b.worker.toLowerCase());
-    });
+    function fmtHours(h) {
+      const num = typeof h === 'number' ? h : parseFloat(h);
+      if (Number.isNaN(num)) return '';
+      // keep 2 decimals only when needed
+      const clean = Math.round(num * 100) / 100;
+      const asInt = Number.isInteger(clean);
+      return `${asInt ? clean.toFixed(0) : clean.toFixed(2)}hrs`;
+    }
 
-    const allDates = rows
-      .map((r) => r.date)
-      .filter((d) => d && d !== '(no date)');
-    allDates.sort((a, b) => parseDateKeyForSort(a) - parseDateKeyForSort(b));
-
-    const firstDate = allDates[0] || '';
-    const lastDate = allDates[allDates.length - 1] || firstDate;
-    const dateRangeLine =
-      firstDate && lastDate && firstDate !== lastDate
-        ? `${firstDate} - ${lastDate}`
-        : firstDate || '(no date)';
-
-    const primarySite = pickPrimaryJobSite(rows);
-
+    // Build the lines in the exact simple style
     const lines = [];
-
-    // Header
-    lines.push(`Job: ${primarySite}`);
-    lines.push(`Dates Worked: ${dateRangeLine}`);
-    lines.push(`Location: ${primarySite}`);
+    lines.push(`${jobTitle} work hrs`);
     lines.push('');
 
-    // Daily breakdown
-    lines.push('-- DAILY BREAKDOWN --');
-    lines.push('');
+    rows.forEach((r) => {
+      const name = (r.worker || '').trim() || '(no name)';
+      const start = fmtTime(r.start);
+      const end = fmtTime(r.end);
+      const hrs = fmtHours(r.hours);
 
-    const groupedByDate = groupRowsByDate(rows);
-    groupedByDate.forEach(([date, list]) => {
-      const label = date === '(no date)' ? 'No specific date' : date;
-      lines.push(`${label}:`);
-      list.forEach((r) => {
-        const hrs = r.hours ? r.hours.toFixed(2) : '';
-        lines.push(
-          `- ${r.worker}: ${r.start} to ${r.end} (${hrs} hrs)`
-        );
-      });
-      lines.push('');
+      // Example: "Eduardo Cabrera   8am - 12pm   4hrs"
+      lines.push(`${name}   ${start} - ${end}   ${hrs}`);
     });
 
-    // Summary by worker
-    lines.push('-- SUMMARY BY WORKER --');
-    lines.push('');
-
-    const workers = buildSummaryByWorker(rows);
-    workers.forEach(([workerName, info]) => {
-      lines.push(`${workerName}:`);
-      const dateEntries = Array.from(info.perDate.entries());
-      dateEntries.sort(
-        (a, b) => parseDateKeyForSort(a[0]) - parseDateKeyForSort(b[0])
-      );
-      dateEntries.forEach(([date, hrs]) => {
-        const label = date === '(no date)' ? 'No date' : date;
-        lines.push(`- ${label}: ${hrs.toFixed(2)} hrs`);
-      });
-      lines.push(`Total: ${info.total.toFixed(2)} hrs`);
-      lines.push('');
-    });
-
-    // Notes
     const cleanNotes = (notesText || '').trim();
     if (cleanNotes) {
-      lines.push('-- NOTES --');
+      lines.push('');
       lines.push(cleanNotes);
     }
 
