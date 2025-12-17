@@ -5,104 +5,11 @@ const buildTableBtn = document.getElementById('buildTableBtn');
 const outputTable = document.getElementById('outputTable');
 const recordingOverlay = document.getElementById('recordingOverlay');
 
-const notesInput = document.getElementById('notes');
-const recordNotesBtn = document.getElementById('recordNotesBtn');
-const buildReportBtn = document.getElementById('finalReportBtn');
-const finalReportOutput = document.getElementById('finalReportOutput');
-const copyFullReportBtn = document.getElementById('copyFullReportBtn');
-const CELEBRATION_GIFS = [
-  'celebrate1.gif',
-  'celebrate2.gif',
-  'celebrate3.gif',
-  'celebrate4.gif',
-  'celebrate5.gif'
-];
-  const celebrationGifs = [
-    'gifs/tmp_1.gif',
-    'gifs/tmp_2.gif',
-    'gifs/tmp_3.gif',
-    'gifs/tmp_4.gif',
-    'gifs/tmp_5.gif'
-  ];
-
-  function showCelebrationGif() {
-    const overlay = document.getElementById('gifOverlay');
-    const img = document.getElementById('successGif');
-    if (!overlay || !img || !celebrationGifs.length) return;
-
-    const randomIndex = Math.floor(Math.random() * celebrationGifs.length);
-    img.src = celebrationGifs[randomIndex];
-
-    overlay.classList.add('show');
-
-    setTimeout(() => {
-      overlay.classList.remove('show');
-    }, 2200);
-  }
-
-  // Show the celebration modal with a random GIF
-  function showCelebration() {
-    const modal = document.getElementById('celebration-modal');
-    const gif = document.getElementById('celebration-gif');
-
-    if (!modal || !gif || !CELEBRATION_GIFS.length) return;
-
-    const pick =
-      CELEBRATION_GIFS[Math.floor(Math.random() * CELEBRATION_GIFS.length)];
-
-    gif.src = `/img/celebrate/${pick}`;
-    modal.style.display = 'flex';
-
-    modal.onclick = () => {
-      modal.style.display = 'none';
-      gif.src = '';
-    };
-  }
-
-  /* -------------------------------------------------------
-     Celebration GIF Overlay (Full-screen modal)
-  ------------------------------------------------------- */
-  function showCelebrationGIF() {
-    const gifs = [
-      'img/celebrate/celebrate1.gif',
-      'img/celebrate/celebrate2.gif',
-      'img/celebrate/celebrate3.gif',
-      'img/celebrate/celebrate4.gif',
-      'img/celebrate/celebrate5.gif'
-    ];
-    const chosen = gifs[Math.floor(Math.random() * gifs.length)];
-
-    const backdrop = document.createElement('div');
-    backdrop.style.position = 'fixed';
-    backdrop.style.top = 0;
-    backdrop.style.left = 0;
-    backdrop.style.width = '100vw';
-    backdrop.style.height = '100vh';
-    backdrop.style.background = 'rgba(0,0,0,0.55)';
-    backdrop.style.backdropFilter = 'blur(6px)';
-    backdrop.style.webkitBackdropFilter = 'blur(6px)';
-    backdrop.style.display = 'flex';
-    backdrop.style.alignItems = 'center';
-    backdrop.style.justifyContent = 'center';
-    backdrop.style.zIndex = 99999;
-    backdrop.style.transition = 'opacity 0.25s ease';
-
-    const gif = document.createElement('img');
-    gif.src = chosen;
-    gif.style.maxWidth = '85vw';
-    gif.style.maxHeight = '85vh';
-    gif.style.borderRadius = '16px';
-    gif.style.boxShadow = '0 0 30px rgba(0,0,0,0.6)';
-    gif.style.objectFit = 'contain';
-
-    backdrop.appendChild(gif);
-    document.body.appendChild(backdrop);
-
-    backdrop.addEventListener('click', () => {
-      backdrop.style.opacity = '0';
-      setTimeout(() => backdrop.remove(), 250);
-    });
-  }
+	const notesInput = document.getElementById('notes');
+	const recordNotesBtn = document.getElementById('recordNotesBtn');
+	const buildReportBtn = document.getElementById('finalReportBtn');
+	const finalReportOutput = document.getElementById('finalReportOutput');
+	const copyFullReportBtn = document.getElementById('copyFullReportBtn');
 
   const copyCsvBtn = document.getElementById('copyCsvBtn');
   const downloadCsvBtn = document.getElementById('downloadCsvBtn');
@@ -399,29 +306,42 @@ const CELEBRATION_GIFS = [
       return `${asInt ? clean.toFixed(0) : clean.toFixed(2)}hrs`;
     }
 
-    // Build the lines in the exact simple style
-    const lines = [];
-    lines.push(`${jobTitle} work hrs`);
-    lines.push('');
-
-    rows.forEach((r) => {
-      const name = (r.worker || '').trim() || '(no name)';
-      const start = fmtTime(r.start);
-      const end = fmtTime(r.end);
-      const hrs = fmtHours(r.hours);
-
-      // Example: "Eduardo Cabrera   8am - 12pm   4hrs"
-      lines.push(`${name}   ${start} - ${end}   ${hrs}`);
-    });
-
-    const cleanNotes = (notesText || '').trim();
-    if (cleanNotes) {
-      lines.push('');
-      lines.push(cleanNotes);
-    }
-
-    return lines.join('\n');
-  }
+	    // Build the lines in the exact simple style
+	    const dates = rows
+	      .map((r) => (r.date || '').trim())
+	      .filter((d) => d && d !== '(no date)');
+	    const uniqueDates = Array.from(new Set(dates));
+	    uniqueDates.sort(
+	      (a, b) => parseDateKeyForSort(a) - parseDateKeyForSort(b)
+	    );
+	
+	    let dateLine = '(No date provided)';
+	    if (uniqueDates.length === 1) {
+	      dateLine = uniqueDates[0];
+	    } else if (uniqueDates.length > 1) {
+	      const first = uniqueDates[0];
+	      const last = uniqueDates[uniqueDates.length - 1];
+	      dateLine = first === last ? first : `${first} - ${last}`;
+	    }
+	
+	    const workerLines = rows.map((r) => {
+	      const name = (r.worker || '').trim() || '(no name)';
+	      const start = fmtTime(r.start);
+	      const end = fmtTime(r.end);
+	      const hrs = fmtHours(r.hours);
+	
+	      // Example: "Eduardo Cabrera   8am - 12pm   4hrs"
+	      return `${name}   ${start} - ${end}   ${hrs}`;
+	    });
+	
+	    const cleanNotes = (notesText || '').trim();
+	    const headerBlock = `${jobTitle} work hrs\n${dateLine}`;
+	    const workersBlock = workerLines.join('\n\n');
+	
+	    return cleanNotes
+	      ? `${headerBlock}\n\n${workersBlock}\n\n${cleanNotes}`
+	      : `${headerBlock}\n\n${workersBlock}`;
+	  }
   // ---------------------------------------------------------------------------
   // Helper: render editable table from CSV (data rows only; summary is rebuilt)
   // ---------------------------------------------------------------------------
@@ -844,19 +764,14 @@ const CELEBRATION_GIFS = [
       temp.focus();
       temp.select();
 
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          alert('Full report copied!');
-          if (!document.getElementById('celebration-overlay')) {
-            setTimeout(() => {
-              showCelebrationGIF();
-            }, 150);
-          }
-        } else {
-          alert('Could not auto-copy. The report is selected – tap Copy.');
-        }
-      } catch (err) {
+	      try {
+	        const successful = document.execCommand('copy');
+	        if (successful) {
+	          alert('Full report copied!');
+	        } else {
+	          alert('Could not auto-copy. The report is selected – tap Copy.');
+	        }
+	      } catch (err) {
         console.error('Copy failed:', err);
         alert('Could not auto-copy. The report is selected – tap Copy.');
       }
@@ -1001,67 +916,7 @@ const CELEBRATION_GIFS = [
     startRecording(transcriptInput, recordBtn);
   });
 
-  recordNotesBtn.addEventListener('click', () => {
-    startRecording(notesInput, recordNotesBtn);
-  });
-});
-
-/* —————————————————––
-   Celebration GIF Overlay (Full-screen modal) — SAFE VERSION
-    • Only one overlay at a time
-    • Tap anywhere to dismiss
-—————————————————–– */
-function showCelebrationGIF() {
-  const existing = document.getElementById('celebration-overlay');
-  if (existing) {
-    existing.remove();
-  }
-
-  const gifs = [
-    'img/celebrate/celebrate1.gif',
-    'img/celebrate/celebrate2.gif',
-    'img/celebrate/celebrate3.gif',
-    'img/celebrate/celebrate4.gif',
-    'img/celebrate/celebrate5.gif'
-  ];
-  const chosen = gifs[Math.floor(Math.random() * gifs.length)];
-
-  const backdrop = document.createElement('div');
-  backdrop.id = 'celebration-overlay';
-  backdrop.style.position = 'fixed';
-  backdrop.style.top = 0;
-  backdrop.style.left = 0;
-  backdrop.style.width = '100vw';
-  backdrop.style.height = '100vh';
-  backdrop.style.background = 'rgba(0,0,0,0.55)';
-  backdrop.style.backdropFilter = 'blur(6px)';
-  backdrop.style.webkitBackdropFilter = 'blur(6px)';
-  backdrop.style.display = 'flex';
-  backdrop.style.alignItems = 'center';
-  backdrop.style.justifyContent = 'center';
-  backdrop.style.zIndex = 99999;
-  backdrop.style.opacity = '0';
-  backdrop.style.transition = 'opacity 0.25s ease';
-
-  const gif = document.createElement('img');
-  gif.src = chosen;
-  gif.alt = 'Success!';
-  gif.style.maxWidth = '85vw';
-  gif.style.maxHeight = '85vh';
-  gif.style.borderRadius = '16px';
-  gif.style.boxShadow = '0 0 30px rgba(0,0,0,0.6)';
-  gif.style.objectFit = 'contain';
-
-  backdrop.appendChild(gif);
-  document.body.appendChild(backdrop);
-
-  requestAnimationFrame(() => {
-    backdrop.style.opacity = '1';
-  });
-
-  backdrop.addEventListener('click', (e) => {
-    e.stopPropagation();
-    backdrop.style.opacity = '0';
-    setTimeout(() => backdrop.remove(), 250);
-  });
-}
+	  recordNotesBtn.addEventListener('click', () => {
+	    startRecording(notesInput, recordNotesBtn);
+	  });
+	});
