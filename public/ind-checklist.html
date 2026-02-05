@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IND → Prime Vendor Roadmap Checklist</title>
+<style>
+  :root{
+    /* Inspired by warm editorial “white mode” */
+    --bg:#f6f1e7;          /* warm paper */
+    --card:#ffffff;        /* clean white */
+    --card2:#fbf7ef;       /* subtle tint */
+    --text:#0b0c10;        /* near-black */
+    --muted:#4a4f57;       /* readable grey */
+    --line:#0b0c10;        /* crisp ink lines */
+    --accent:#ff8a00;      /* orange highlight */
+    --ok:#0b0c10;          /* keep check UI crisp */
+    --warn:#ff8a00;
+    --shadow: 0 10px 30px rgba(0,0,0,.08);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    background: var(--bg);
+    color:var(--text);
+  }
+
+  .wrap{
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 22px 14px 70px;
+  }
+
+  header{
+    display:flex;
+    gap:14px;
+    flex-direction:column;
+    padding: 10px 10px 10px;
+  }
+
+  h1{
+    font-size: 20px;
+    margin:0;
+    letter-spacing:0.2px;
+    font-weight:800;
+    text-transform: none;
+  }
+
+  .sub{
+    color:var(--muted);
+    font-size: 13px;
+    line-height:1.45;
+    margin:0;
+  }
+
+  .truth{
+    border:1px solid var(--line);
+    background: var(--card);
+    border-radius: 16px;
+    padding: 12px 12px;
+    font-size: 13px;
+    line-height: 1.45;
+    box-shadow: var(--shadow);
+  }
+  .truth b{color:var(--accent)}
+
+  .topbar{
+    display:flex;
+    align-items:stretch;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top: 8px;
+  }
+
+  .progress{
+    flex: 1 1 280px;
+    border:1px solid var(--line);
+    background: var(--card);
+    border-radius: 16px;
+    padding: 10px 12px;
+    min-width:280px;
+    box-shadow: var(--shadow);
+  }
+
+  .progress .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+  }
+
+  .pct{
+    font-size:12px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+
+  .bar{
+    height: 10px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid var(--line);
+    overflow:hidden;
+    margin-top:10px;
+  }
+
+  .fill{
+    height:100%;
+    width:0%;
+    background: var(--accent);
+    transition: width 250ms ease;
+  }
+
+  .actions{
+    display:flex;
+    gap:8px;
+    flex: 0 0 auto;
+  }
+
+  button{
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    cursor:pointer;
+    transition: transform 80ms ease, background 150ms ease;
+    user-select:none;
+    box-shadow: var(--shadow);
+  }
+  button:hover{background: var(--card2)}
+  button:active{transform: translateY(1px)}
+
+  .grid{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top: 14px;
+  }
+
+  details.phase{
+    border:1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card);
+    overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+
+  summary{
+    list-style:none;
+    cursor:pointer;
+    padding: 14px 12px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    background: var(--card);
+    border-bottom:1px solid var(--line);
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none}
+
+  .ph-title{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width:0;
+  }
+
+  .ph-title .name{
+    font-weight:800;
+    font-size: 14px;
+    letter-spacing:0.15px;
+  }
+
+  .ph-title .goal{
+    font-size: 12px;
+    color: var(--muted);
+    line-height:1.35;
+  }
+
+  .ph-meta{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex: 0 0 auto;
+    color: var(--muted);
+    font-size: 12px;
+    white-space:nowrap;
+  }
+
+  .pill{
+    border:1px solid var(--line);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--card2);
+  }
+
+  .content{
+    padding: 12px 12px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    background: var(--card);
+  }
+
+  .step{
+    border:1px solid var(--line);
+    background: var(--card2);
+    border-radius: 16px;
+    padding: 12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .stephead{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+  }
+
+  .stephead .left{
+    min-width:0;
+  }
+
+  .stepname{
+    margin:0;
+    font-size: 13px;
+    font-weight:800;
+    letter-spacing:0.12px;
+  }
+
+  .stepnote{
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height:1.4;
+  }
+
+  .cost{
+    color: var(--accent);
+    font-size: 12px;
+    white-space:nowrap;
+    flex: 0 0 auto;
+    padding-top:1px;
+    font-weight:700;
+  }
+
+  ul{
+    margin:0;
+    padding-left: 18px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  li{
+    line-height: 1.45;
+    font-size: 13px;
+  }
+
+  .check{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding: 4px 0;
+  }
+
+  input[type="checkbox"]{
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    flex: 0 0 auto;
+  }
+
+  label{
+    cursor:pointer;
+    flex:1 1 auto;
+  }
+
+  .mini{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:2px;
+  }
+
+  .divider{
+    height:1px;
+    background: var(--line);
+    margin: 6px 0;
+    opacity: .25;
+  }
+
+  .snapshot{
+    border:1px solid var(--line);
+    background: var(--card);
+    border-radius: 18px;
+    padding: 12px;
+    margin-top: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .snap-title{
+    font-size: 13px;
+    font-weight: 800;
+    margin:0 0 8px;
+  }
+
+  .snap-grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:10px;
+  }
+
+  .snap-item{
+    border:1px solid var(--line);
+    background: var(--card2);
+    border-radius: 16px;
+    padding: 10px 10px;
+  }
+
+  .snap-item .k{
+    color: var(--muted);
+    font-size: 12px;
+    margin:0;
+  }
+
+  .snap-item .v{
+    margin: 4px 0 0;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .footer{
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height:1.5;
+    padding: 0 10px;
+  }
+
+  code{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    padding: 2px 6px;
+    border: 1px solid rgba(11,12,16,.25);
+    border-radius: 10px;
+    background: rgba(255,138,0,.10);
+  }
+
+  .sr{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>IND → PRIME VENDOR ROADMAP</h1>
+      <p class="sub">From zero → first profitable year. Simple checklist that saves progress on your phone.</p>
+
+      <div class="truth">
+        <div><b>FINAL TRUTH</b></div>
+        <div>You do not need permission to do this. You need <b>insurance</b>, <b>clarity of scope</b>, and <b>demand</b>. Everything else is sequencing.</div>
+      </div>
+
+      <div class="topbar">
+        <div class="progress" aria-label="Overall progress">
+          <div class="row">
+            <div style="font-weight:700;font-size:13px;">Progress</div>
+            <div class="pct"><span id="doneCount">0</span>/<span id="totalCount">0</span> completed • <span id="pct">0%</span></div>
+          </div>
+          <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="fill" id="fill"></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="expandAll" type="button">Expand all</button>
+          <button id="collapseAll" type="button">Collapse all</button>
+          <button id="reset" type="button">Reset checks</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="grid" id="grid">
+
+      <!-- PHASE 0 -->
+      <details class="phase" open>
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 0 — REALITY CHECK</div>
+            <div class="goal">Goal: Confirm this is real demand, not a hypothetical.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="0">0</span>/<span class="phaseTotal" data-phase="0">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">0.1 — Confirm demand signals</p>
+              </div>
+              <div class="cost">Cost: $0</div>
+            </div>
+
+            <div class="check">
+              <input type="checkbox" id="c-0-1a" data-phase="0" />
+              <label for="c-0-1a">At least <b>1–2 clients explicitly asking</b> to work directly</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-0-1b" data-phase="0" />
+              <label for="c-0-1b">Verbal confirmation they’d pay for <b>labor only</b> (now)</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-0-1c" data-phase="0" />
+              <label for="c-0-1c">Verbal confirmation they’d pay for <b>full booth</b> (later, optional)</label>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">0.2 — Decide starting posture (choose ONE)</p>
+                <p class="stepnote">Do not proceed without clarity here.</p>
+              </div>
+              <div class="cost">Cost: $0</div>
+            </div>
+
+            <div class="check">
+              <input type="checkbox" id="c-0-2a" data-phase="0" />
+              <label for="c-0-2a">Labor-only IND (fastest)</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-0-2b" data-phase="0" />
+              <label for="c-0-2b">Prime vendor with partners (recommended next)</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-0-2c" data-phase="0" />
+              <label for="c-0-2c">Full fabrication (explicitly postponed)</label>
+            </div>
+            <div class="mini">Tip: you can check more than one, but in real life you’re picking a primary starting posture.</div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- PHASE 1 -->
+      <details class="phase">
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 1 — LEGAL + RISK FOUNDATION (Week 1)</div>
+            <div class="goal">Goal: Become transact-ready and insurable.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="1">0</span>/<span class="phaseTotal" data-phase="1">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 1 — Form the entity</p>
+              </div>
+              <div class="cost">Cost: $200–$800</div>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-1a" data-phase="1" />
+              <label for="c-1-1a">LLC (Nevada or home state)</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-1b" data-phase="1" />
+              <label for="c-1-1b">EIN from IRS</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-1c" data-phase="1" />
+              <label for="c-1-1c">Operating agreement (simple)</label>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 2 — Open business banking</p>
+              </div>
+              <div class="cost">Cost: $0–$50</div>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-2a" data-phase="1" />
+              <label for="c-1-2a">Business checking account</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-2b" data-phase="1" />
+              <label for="c-1-2b">Debit card</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-2c" data-phase="1" />
+              <label for="c-1-2c">(Optional) savings for tax/overhead</label>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 3 — Insurance (permission layer)</p>
+                <p class="stepnote">This is what makes you “legitimate.”</p>
+              </div>
+              <div class="cost">Cost: $200–$400/mo typical</div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="mini"><b>Required</b></div>
+
+            <div class="check">
+              <input type="checkbox" id="c-1-3a" data-phase="1" />
+              <label for="c-1-3a">General Liability (GL) — $1M per occurrence / $2M aggregate</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-3b" data-phase="1" />
+              <label for="c-1-3b">Workers’ Comp (if paying labor)</label>
+            </div>
+
+            <div class="divider"></div>
+            <div class="mini"><b>Optional (later)</b></div>
+
+            <div class="check">
+              <input type="checkbox" id="c-1-3c" data-phase="1" />
+              <label for="c-1-3c">Inland marine (gear)</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-3d" data-phase="1" />
+              <label for="c-1-3d">Commercial auto (if hauling)</label>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 4 — Certificates of Insurance (COIs)</p>
+                <p class="stepnote">Checkpoint: you can now legally invoice and accept jobs.</p>
+              </div>
+              <div class="cost">Cost: usually $0</div>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-4a" data-phase="1" />
+              <label for="c-1-4a">Confirm you can issue COIs</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-4b" data-phase="1" />
+              <label for="c-1-4b">Confirm you can add “Additional Insured” when requested</label>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="c-1-4c" data-phase="1" />
+              <label for="c-1-4c"><b>Checkpoint:</b> Ready to invoice and accept jobs</label>
+            </div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- PHASE 2 -->
+      <details class="phase">
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 2 — IND LABOR OPERATIONS (Weeks 1–4)</div>
+            <div class="goal">Goal: Start earning immediately with minimal overhead.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="2">0</span>/<span class="phaseTotal" data-phase="2">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 5 — Define labor-only scope (internal)</p>
+                <p class="stepnote">Not contracts yet — just alignment.</p>
+              </div>
+              <div class="cost">Cost: $0</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-2-5a" data-phase="2" /><label for="c-2-5a">Install & dismantle labor</label></div>
+            <div class="check"><input type="checkbox" id="c-2-5b" data-phase="2" /><label for="c-2-5b">Crew leadership</label></div>
+            <div class="check"><input type="checkbox" id="c-2-5c" data-phase="2" /><label for="c-2-5c">No design</label></div>
+            <div class="check"><input type="checkbox" id="c-2-5d" data-phase="2" /><label for="c-2-5d">No fabrication</label></div>
+            <div class="check"><input type="checkbox" id="c-2-5e" data-phase="2" /><label for="c-2-5e">No engineering responsibility</label></div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 6 — Crew structure</p>
+              </div>
+              <div class="cost">Cost: varies</div>
+            </div>
+
+            <div class="mini"><b>Decide</b></div>
+            <div class="check"><input type="checkbox" id="c-2-6a" data-phase="2" /><label for="c-2-6a">1099 subcontractors</label></div>
+            <div class="check"><input type="checkbox" id="c-2-6b" data-phase="2" /><label for="c-2-6b">W-2 employees</label></div>
+            <div class="check"><input type="checkbox" id="c-2-6c" data-phase="2" /><label for="c-2-6c">Hybrid</label></div>
+
+            <div class="divider"></div>
+            <div class="mini"><b>Set</b></div>
+            <div class="check"><input type="checkbox" id="c-2-6d" data-phase="2" /><label for="c-2-6d">Day rates</label></div>
+            <div class="check"><input type="checkbox" id="c-2-6e" data-phase="2" /><label for="c-2-6e">OT rules</label></div>
+            <div class="check"><input type="checkbox" id="c-2-6f" data-phase="2" /><label for="c-2-6f">Call times</label></div>
+            <div class="check"><input type="checkbox" id="c-2-6g" data-phase="2" /><label for="c-2-6g">Crew lead premium</label></div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 7 — First IND jobs</p>
+                <p class="stepnote">Target: 2–4 labor jobs before touching inventory.</p>
+              </div>
+              <div class="cost">Revenue stage</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-2-7a" data-phase="2" /><label for="c-2-7a">Send invoices</label></div>
+            <div class="check"><input type="checkbox" id="c-2-7b" data-phase="2" /><label for="c-2-7b">Get paid</label></div>
+            <div class="check"><input type="checkbox" id="c-2-7c" data-phase="2" /><label for="c-2-7c">Pay crew</label></div>
+
+            <div class="divider"></div>
+            <div class="mini"><b>Track</b></div>
+            <div class="check"><input type="checkbox" id="c-2-7d" data-phase="2" /><label for="c-2-7d">Labor hours</label></div>
+            <div class="check"><input type="checkbox" id="c-2-7e" data-phase="2" /><label for="c-2-7e">Margin per job</label></div>
+            <div class="check"><input type="checkbox" id="c-2-7f" data-phase="2" /><label for="c-2-7f">Pain points</label></div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- PHASE 3 -->
+      <details class="phase">
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 3 — PRIME VENDOR TRANSITION (Months 2–4)</div>
+            <div class="goal">Goal: Take direct clients without owning fabrication yet.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="3">0</span>/<span class="phaseTotal" data-phase="3">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 8 — Prime vendor positioning</p>
+              </div>
+              <div class="cost">Cost: $0</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-3-8a" data-phase="3" /><label for="c-3-8a">Become single point of contact</label></div>
+            <div class="check"><input type="checkbox" id="c-3-8b" data-phase="3" /><label for="c-3-8b">Coordinate fabrication partners</label></div>
+            <div class="check"><input type="checkbox" id="c-3-8c" data-phase="3" /><label for="c-3-8c">Coordinate graphics printers</label></div>
+            <div class="check"><input type="checkbox" id="c-3-8d" data-phase="3" /><label for="c-3-8d">Coordinate labor (yours)</label></div>
+            <div class="mini">Still asset-light.</div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 9 — Partner stack (no capital)</p>
+                <p class="stepnote">No money spent yet.</p>
+              </div>
+              <div class="cost">Cost: $0</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-3-9a" data-phase="3" /><label for="c-3-9a">Line up 1–2 fabricators</label></div>
+            <div class="check"><input type="checkbox" id="c-3-9b" data-phase="3" /><label for="c-3-9b">Line up 1 graphics printer (SEG fabric)</label></div>
+            <div class="check"><input type="checkbox" id="c-3-9c" data-phase="3" /><label for="c-3-9c">Line up 1 freight/drayage contact</label></div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 10 — Direct client pilot</p>
+                <p class="stepnote">Purpose: learn where money leaks before buying inventory.</p>
+              </div>
+              <div class="cost">Revenue stage</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-3-10a" data-phase="3" /><label for="c-3-10a">Take 1 full booth job</label></div>
+            <div class="check"><input type="checkbox" id="c-3-10b" data-phase="3" /><label for="c-3-10b">Client owns graphics OR pays pass-through</label></div>
+            <div class="check"><input type="checkbox" id="c-3-10c" data-phase="3" /><label for="c-3-10c">Fabrication outsourced</label></div>
+            <div class="check"><input type="checkbox" id="c-3-10d" data-phase="3" /><label for="c-3-10d">You manage + install</label></div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- PHASE 4 -->
+      <details class="phase">
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 4 — INVENTORY DECISION (Months 4–6)</div>
+            <div class="goal">Goal: Decide if owning assets improves margin enough.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="4">0</span>/<span class="phaseTotal" data-phase="4">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 11 — Inventory go/no-go</p>
+              </div>
+              <div class="cost">Cost: $0</div>
+            </div>
+            <div class="mini">Only proceed if:</div>
+            <div class="check"><input type="checkbox" id="c-4-11a" data-phase="4" /><label for="c-4-11a">≥ 3 booth jobs confirmed or likely</label></div>
+            <div class="check"><input type="checkbox" id="c-4-11b" data-phase="4" /><label for="c-4-11b">Labor margins are stable</label></div>
+            <div class="check"><input type="checkbox" id="c-4-11c" data-phase="4" /><label for="c-4-11c">Storage secured or affordable</label></div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- PHASE 5 -->
+      <details class="phase">
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 5 — INVENTORY ACQUISITION (Months 5–7)</div>
+            <div class="goal">Goal: Own reusable assets that pay themselves off.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="5">0</span>/<span class="phaseTotal" data-phase="5">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 12 — beMatrix starter inventory</p>
+                <p class="stepnote">Capital type: one-time, reusable, resale-able.</p>
+              </div>
+              <div class="cost">Target: $65k–$80k</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-5-12a" data-phase="5" /><label for="c-5-12a">~80–135 frames</label></div>
+            <div class="check"><input type="checkbox" id="c-5-12b" data-phase="5" /><label for="c-5-12b">Connectors & feet</label></div>
+            <div class="check"><input type="checkbox" id="c-5-12c" data-phase="5" /><label for="c-5-12c">3–4 counters</label></div>
+            <div class="check"><input type="checkbox" id="c-5-12d" data-phase="5" /><label for="c-5-12d">Lighting</label></div>
+            <div class="check"><input type="checkbox" id="c-5-12e" data-phase="5" /><label for="c-5-12e">Transport cases</label></div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 13 — Warehouse</p>
+              </div>
+              <div class="cost">~$1.2k–$1.6k/mo + $3k–$4k move-in</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-5-13a" data-phase="5" /><label for="c-5-13a">Secure 800–1,200 sq ft space</label></div>
+            <div class="check"><input type="checkbox" id="c-5-13b" data-phase="5" /><label for="c-5-13b">Budget Vegas cost ($1,200–$1,600/month)</label></div>
+            <div class="check"><input type="checkbox" id="c-5-13c" data-phase="5" /><label for="c-5-13c">Budget move-in (~$3,000–$4,000)</label></div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- PHASE 6 -->
+      <details class="phase">
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 6 — REVENUE RAMP (Months 7–12)</div>
+            <div class="goal">Goal: Pay off inventory and hit profitability.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="6">0</span>/<span class="phaseTotal" data-phase="6">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 14 — Target booth volume</p>
+                <p class="stepnote">Break-even math: ~$10,500 gross profit per medium booth • ~$80k paid off in 8 booths.</p>
+              </div>
+              <div class="cost">Revenue stage</div>
+            </div>
+            <div class="mini"><b>Targets</b></div>
+            <div class="check"><input type="checkbox" id="c-6-14a" data-phase="6" /><label for="c-6-14a">Conservative: 3–4 booths/year</label></div>
+            <div class="check"><input type="checkbox" id="c-6-14b" data-phase="6" /><label for="c-6-14b">Solid: 6–8 booths/year</label></div>
+            <div class="check"><input type="checkbox" id="c-6-14c" data-phase="6" /><label for="c-6-14c">Strong: 10+ booths/year</label></div>
+            <div class="check"><input type="checkbox" id="c-6-14d" data-phase="6" /><label for="c-6-14d"><b>Milestone:</b> 8 medium booths completed (inventory paid off)</label></div>
+          </div>
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">Step 15 — Reinvest intelligently</p>
+              </div>
+              <div class="cost">Profit stage</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-6-15a" data-phase="6" /><label for="c-6-15a">Finish inventory gaps</label></div>
+            <div class="check"><input type="checkbox" id="c-6-15b" data-phase="6" /><label for="c-6-15b">Improve transport/storage</label></div>
+            <div class="check"><input type="checkbox" id="c-6-15c" data-phase="6" /><label for="c-6-15c">Add specialty items (lighting, counters)</label></div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- PHASE 7 -->
+      <details class="phase">
+        <summary>
+          <div class="ph-title">
+            <div class="name">PHASE 7 — FIRST PROFITABLE YEAR CHECKPOINT</div>
+            <div class="goal">Goal: Confirm stability by month 12.</div>
+          </div>
+          <div class="ph-meta">
+            <span class="pill"><span class="phaseDone" data-phase="7">0</span>/<span class="phaseTotal" data-phase="7">0</span></span>
+          </div>
+        </summary>
+        <div class="content">
+
+          <div class="step">
+            <div class="stephead">
+              <div class="left">
+                <p class="stepname">By month 12, you want:</p>
+              </div>
+              <div class="cost">Checkpoint</div>
+            </div>
+            <div class="check"><input type="checkbox" id="c-7-12a" data-phase="7" /><label for="c-7-12a">Inventory paid off or close</label></div>
+            <div class="check"><input type="checkbox" id="c-7-12b" data-phase="7" /><label for="c-7-12b">Predictable labor pool</label></div>
+            <div class="check"><input type="checkbox" id="c-7-12c" data-phase="7" /><label for="c-7-12c">Repeat clients</label></div>
+            <div class="check"><input type="checkbox" id="c-7-12d" data-phase="7" /><label for="c-7-12d">Positive cash flow</label></div>
+            <div class="check"><input type="checkbox" id="c-7-12e" data-phase="7" /><label for="c-7-12e">(Optional) second inventory kit planning</label></div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- COST SNAPSHOT -->
+      <section class="snapshot" aria-label="One-page cost snapshot">
+        <p class="snap-title">📊 ONE-PAGE COST SNAPSHOT</p>
+        <div class="snap-grid">
+          <div class="snap-item">
+            <p class="k">Startup (labor IND)</p>
+            <p class="v">LLC + banking: $300–$800 • Insurance: $200–$400/mo • Tools/incidentals: $1k–$3k</p>
+          </div>
+          <div class="snap-item">
+            <p class="k">Inventory expansion (optional)</p>
+            <p class="v">beMatrix stack: $65k–$80k • Warehouse: ~$1.5k/mo</p>
+          </div>
+          <div class="snap-item">
+            <p class="k">Break-even</p>
+            <p class="v">~8 medium booths</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        <div><b>How to use:</b> Save this file as <code>ind-checklist.html</code> and open it in any phone browser. Your checkmarks persist automatically on that device.</div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    (function(){
+      const STORAGE_KEY = "ind_prime_vendor_checklist_v1";
+
+      const boxes = Array.from(document.querySelectorAll('input[type="checkbox"][id]'));
+      const fill = document.getElementById('fill');
+      const pctEl = document.getElementById('pct');
+      const doneEl = document.getElementById('doneCount');
+      const totalEl = document.getElementById('totalCount');
+
+      const phaseDoneEls = Array.from(document.querySelectorAll('.phaseDone'));
+      const phaseTotalEls = Array.from(document.querySelectorAll('.phaseTotal'));
+      const phases = new Set(boxes.map(b => b.dataset.phase));
+
+      // totals
+      totalEl.textContent = String(boxes.length);
+
+      // phase totals
+      for (const p of phases){
+        const tot = boxes.filter(b => b.dataset.phase === p).length;
+        const tEl = phaseTotalEls.find(x => x.dataset.phase === p);
+        if (tEl) tEl.textContent = String(tot);
+      }
+
+      function readState(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : {};
+        }catch(e){
+          return {};
+        }
+      }
+
+      function writeState(state){
+        try{
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }catch(e){}
+      }
+
+      function applyState(){
+        const state = readState();
+        for (const b of boxes){
+          b.checked = !!state[b.id];
+        }
+      }
+
+      function updateUI(){
+        const done = boxes.filter(b => b.checked).length;
+        const total = boxes.length;
+        const pct = total ? Math.round((done/total)*100) : 0;
+
+        doneEl.textContent = String(done);
+        pctEl.textContent = pct + "%";
+        fill.style.width = pct + "%";
+        const bar = document.querySelector('.bar[role="progressbar"]');
+        if (bar) bar.setAttribute('aria-valuenow', String(pct));
+
+        // phase counts
+        for (const p of phases){
+          const pd = boxes.filter(b => b.dataset.phase === p && b.checked).length;
+          const dEl = phaseDoneEls.find(x => x.dataset.phase === p);
+          if (dEl) dEl.textContent = String(pd);
+        }
+      }
+
+      function onChange(e){
+        const state = readState();
+        state[e.target.id] = e.target.checked;
+        writeState(state);
+        updateUI();
+      }
+
+      function resetAll(){
+        if (!confirm("Reset all checkmarks?")) return;
+        const state = {};
+        writeState(state);
+        boxes.forEach(b => b.checked = false);
+        updateUI();
+      }
+
+      function expandAll(){
+        document.querySelectorAll('details.phase').forEach(d => d.open = true);
+      }
+
+      function collapseAll(){
+        document.querySelectorAll('details.phase').forEach(d => d.open = false);
+      }
+
+      // init
+      applyState();
+      updateUI();
+
+      boxes.forEach(b => b.addEventListener('change', onChange));
+      document.getElementById('reset').addEventListener('click', resetAll);
+      document.getElementById('expandAll').addEventListener('click', expandAll);
+      document.getElementById('collapseAll').addEventListener('click', collapseAll);
+
+    })();
+  </script>
+</body>
+</html>
